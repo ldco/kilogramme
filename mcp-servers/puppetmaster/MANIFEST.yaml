@@ -1,0 +1,167 @@
+# Puppet Master MCP Server — Machine-Readable Manifest
+version: "1.0.0"
+name: "pm-mcp-server"
+description: "26 MCP tools for Puppet Master framework operations, review, knowledge, contributing, and git workflow"
+
+tools:
+  config:
+    - name: pm_config_get
+      description: Read Puppet Master configuration values by dot-notation key
+      schema:
+        key: string (optional, dot-notation)
+
+    - name: pm_config_set
+      description: Modify a configuration value in puppet-master.config.ts
+      schema:
+        key: string (required, dot-notation)
+        value: any (required)
+
+  dev:
+    - name: pm_init
+      description: Initialize a Puppet Master project (check deps, read config, guide setup)
+      schema:
+        mode: develop | build | auto
+        startDev: boolean
+
+    - name: pm_dev
+      description: Manage the PM development server (start/stop/restart/status)
+      schema:
+        action: start | stop | restart | status
+        port: number (default 3000)
+
+    - name: pm_status
+      description: Display full project status (config, database, dev server, modules)
+      schema:
+        detail: summary | config | modules | db | full
+
+  database:
+    - name: pm_db_push
+      description: Push Drizzle ORM schema to SQLite database
+      schema: {}
+
+    - name: pm_db_seed
+      description: Seed the database with initial data
+      schema: {}
+
+    - name: pm_db_reset
+      description: Reset database (delete, re-migrate, re-seed)
+      schema: {}
+
+    - name: pm_db_migrate
+      description: Run Drizzle migrations against the database
+      schema: {}
+
+    - name: pm_db_studio
+      description: Open Drizzle Studio web UI for browsing the database
+      schema: {}
+
+  deploy:
+    - name: pm_deploy
+      description: Deploy to configured VPS (build Docker image, Ansible, Traefik, health check)
+      schema: {}
+
+    - name: pm_rollback
+      description: Roll back deployment to previous Docker image
+      schema: {}
+
+    - name: pm_deploy_logs
+      description: View deployment logs from the VPS
+      schema: {}
+
+    - name: pm_setup
+      description: Provision VPS with Docker, Dockge, Traefik, SSH
+      schema: {}
+
+  quality:
+    - name: pm_build
+      description: Run production build (.output/ directory)
+      schema: {}
+
+    - name: pm_lint
+      description: Run linting with optional auto-fix and format checks
+      schema:
+        fix: boolean
+        format: boolean
+
+    - name: pm_test
+      description: Run test suites (unit, api, e2e, staged)
+      schema:
+        suite: unit | api | e2e | e2e:playwright | staged
+
+  knowledge:
+    - name: pm_knowledge
+      description: Load framework knowledge base (CSS, components, DB, API, config, RTL, rules)
+      schema:
+        topic: css | components | composables | database | api | config | rtl | rules | all
+
+    - name: pm_knowledge_entrypoint
+      description: Load greenfield or brownfield entrypoint documentation
+      schema:
+        mode: greenfield | brownfield | overview
+
+    - name: pm_knowledge_contributing
+      description: List or read PM contribution documents
+      schema:
+        action: list | read
+        file: string (for read)
+
+  contributing:
+    - name: pm_contribute_list
+      description: List all contribution documents with status and date
+      schema:
+        status: string (optional filter)
+
+    - name: pm_contribute_read
+      description: Read a specific contribution document
+      schema:
+        file: string (required)
+
+    - name: pm_contribute_export
+      description: Export current git changes as a .pm-contribution.md file
+      schema:
+        summary: string
+        type: bugfix | feature | enhancement | refactor | docs
+        problem: string
+        solution: string
+        testing: string
+        files: string (comma-separated)
+
+    - name: pm_contribute_apply
+      description: Read a contribution file for manual application
+      schema:
+        file: string (path to contribution file)
+
+  review:
+    - name: pm_review_checklist
+      description: Get review checklist by specialty (PM + stack-specific)
+      schema:
+        specialty: frontend | backend | fullstack | ux | security | devops | go | rust | python | elixir | react-native | flutter | all
+
+    - name: pm_review_run
+      description: Run automated quality checks with stack auto-detection and severity levels
+      schema:
+        scope: full | lint | types | tests | quick
+        fix: boolean
+
+  git:
+    - name: pm_git_commit
+      description: Safe git commit and push workflow with conventional commit messages
+      schema:
+        message: string (optional, auto-generated if omitted)
+        branch: string (optional)
+        push: boolean (default true)
+        files: string (comma-separated, optional)
+
+meta:
+  runtime: Node.js 22+
+  transport: StdioServerTransport (JSON-RPC over stdio)
+  dependencies:
+    - "@modelcontextprotocol/sdk ^1.13.1"
+    - "tsx ^4.21.0"
+  dev_dependencies:
+    - "@types/node ^22.0.0"
+    - "typescript ^5.9.3"
+  registration:
+    type: local
+    command: ["npx", "tsx", "<path>/src/index.ts"]
+    alternative: ["node", "<path>/dist/index.js"]
