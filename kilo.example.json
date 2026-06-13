@@ -63,7 +63,7 @@
     "model": "voyage-code-3",
     "vectorStore": "lancedb",
     "voyage": {
-      "apiKey": "ROTATED_VOYAGE_KEY_PURGED_FROM_GIT"
+      "apiKey": "YOUR_VOYAGE_API_KEY"
     },
     "lancedb": {}
   },

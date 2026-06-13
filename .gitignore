@@ -1,0 +1,7 @@
+node_modules/
+*.tsbuildinfo
+dist/
+package-lock.json
+bun.lock
+package.json
+kilo.json
