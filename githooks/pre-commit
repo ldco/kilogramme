@@ -39,6 +39,7 @@ while IFS= read -r file; do
 
   case "$file" in
     *.sh|*.bash|*.zsh) continue ;;
+    githooks/*|*/pre-commit|*/commit-msg|*/prepare-commit-msg) continue ;;
     *.example.*|*.sample.*|*.template.*|*.tmpl.*|*.test.*|*.spec.*|*.fixture.*) continue ;;
     *.md) continue ;;
     *.lock|*.svg|*.png|*.jpg|*.ico|*.woff2|*.ttf|*.otf|*.map|*.min.*) continue ;;
