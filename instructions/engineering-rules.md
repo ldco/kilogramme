@@ -24,6 +24,14 @@
 - Persist through failures — fix problems until they are resolved. Search the web or read docs before giving up.
 - State success criteria before starting work — what "done" means and how to verify it.
 
+## Security (CRITICAL)
+- **NEVER commit API keys, tokens, passwords, or secrets.** Always use environment variables or `.env` files (gitignored).
+- Before any commit, explicitly check staged files for secrets: API keys (`sk-`, `pa-`, `ghp_`, etc.), private keys, passwords.
+- If a secret was ever committed (even in past history), it is COMPROMISED — notify the user immediately and recommend rotation.
+- Config files with secrets (`kilo.json`, `.env`) MUST be in `.gitignore`. Provide `.example` templates with placeholders instead.
+- When writing code that needs an API key, inject it via `process.env` or config read at runtime — never hardcode.
+- A global pre-commit hook scans for secrets on every commit. If the hook blocks a commit, do NOT use `--no-verify` — fix the problem.
+
 ## Error Handling (TypeScript projects)
 - `catch` clauses: always `catch (e: unknown)`, never bare `catch`.
 - No `any` types — use `unknown`, proper interfaces, or generics.

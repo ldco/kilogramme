@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# Global pre-commit hook — scan staged files for secrets
+# Installed via: git config --global core.hooksPath ~/.config/git/hooks
+set -euo pipefail
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+SECRETS_FOUND=0
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+git diff --cached --name-only --diff-filter=ACM > "$TMPFILE" 2>/dev/null || exit 0
+
+# Patterns for known API key prefixes
+PATTERNS=(
+  "sk-proj-[A-Za-z0-9_-]{20,}"         # OpenAI proj
+  "sk-svcacct-[A-Za-z0-9_-]{20,}"      # OpenAI service
+  "sk-admin-[A-Za-z0-9_-]{20,}"        # OpenAI admin
+  "sk-ant-[A-Za-z0-9_-]{20,}"          # Anthropic
+  "ghp_[A-Za-z0-9]{30,}"               # GitHub personal
+  "gho_[A-Za-z0-9]{30,}"               # GitHub OAuth
+  "ghu_[A-Za-z0-9]{30,}"               # GitHub user
+  "ghs_[A-Za-z0-9]{30,}"               # GitHub server
+  "github_pat_[A-Za-z0-9_]{30,}"       # GitHub PAT
+  "xox[bprs]-[A-Za-z0-9-]{20,}"        # Slack
+  "AIza[0-9A-Za-z_-]{30,}"             # Google
+  "ya29\.[A-Za-z0-9_-]{30,}"           # Google OAuth
+  "hf_[A-Za-z]{20,}"                   # HuggingFace
+  "sq0csp-[A-Za-z0-9_]{20,}"           # Square
+  "sk-[A-Za-z0-9]{24,}"                # Generic stripe/openai key
+  "pa-[A-Za-z0-9_-]{20,}"              # Voyage AI (-pa prefix)
+  "pk-[A-Za-z0-9_-]{20,}"              # Public keys (warn only)
+)
+
+while IFS= read -r file; do
+  [[ -z "$file" ]] && continue
+  [[ ! -f "$file" ]] && continue
+
+  case "$file" in
+    *.sh|*.bash|*.zsh) continue ;;
+    *.example.*|*.sample.*|*.template.*|*.tmpl.*|*.test.*|*.spec.*|*.fixture.*) continue ;;
+    *.md) continue ;;
+    *.lock|*.svg|*.png|*.jpg|*.ico|*.woff2|*.ttf|*.otf|*.map|*.min.*) continue ;;
+    *.pdf|*.zip|*.tar|*.gz|*.tgz|*.bz2|*.xz|*.7z|*.rar) continue ;;
+  esac
+
+  CONTENT=$(git show ":$file" 2>/dev/null) || continue
+
+  # Check known API key prefixes
+  for pattern in "${PATTERNS[@]}"; do
+    if echo "$CONTENT" | grep -qE "$pattern" 2>/dev/null; then
+      echo -e "${RED}[SECRET] $file — matches API key pattern: $pattern${NC}"
+      echo "$CONTENT" | grep -nE "$pattern" | while IFS= read -r line; do
+        echo -e "${RED}  $line${NC}"
+      done
+      SECRETS_FOUND=1
+    fi
+  done
+
+  # Check for generic apiKey/apikey/secret/token with non-placeholder values
+  if echo "$CONTENT" | grep -qE '"(apiKey|apikey|api_key|secret|token|password)"'; then
+    if echo "$CONTENT" | grep -v -E '(YOUR_|REPLACE|CHANGE.ME|xxx+|TODO|EXAMPLE|test_)' | grep -qE '"(apiKey|apikey|api_key|secret|token|password)"'; then
+      echo -e "${RED}[SECRET] $file — generic secret field with real value${NC}"
+      echo "$CONTENT" | grep -nE '"apiKey|"apikey|"api_key|"secret"|"token"|"password"' | while IFS= read -r line; do
+        echo -e "${RED}  $line${NC}"
+      done
+      SECRETS_FOUND=1
+    fi
+  fi
+
+  # Check for private keys
+  if echo "$CONTENT" | grep -qE 'BEGIN.*PRIVATE KEY' 2>/dev/null; then
+    echo -e "${RED}[SECRET] $file — private key detected${NC}"
+    SECRETS_FOUND=1
+  fi
+
+  # Check .env files with real values
+  if [[ "$file" == ".env" || "$file" == *".env" ]] && [[ ! "$file" == *".example"* ]] && [[ ! "$file" == *".template"* ]]; then
+    VARS_WITH_VALUES=$(echo "$CONTENT" | grep -cE '^[A-Za-z_][A-Za-z0-9_]*=.+' 2>/dev/null || echo 0)
+    if [[ $VARS_WITH_VALUES -gt 0 ]]; then
+      echo -e "${YELLOW}[WARN] $file — $VARS_WITH_VALUES env vars with values (should be gitignored)${NC}"
+    fi
+  fi
+
+done < "$TMPFILE"
+
+if [[ $SECRETS_FOUND -eq 1 ]]; then
+  echo ""
+  echo -e "${RED}----------------------------------------${NC}"
+  echo -e "${RED}  COMMIT BLOCKED — secrets detected${NC}"
+  echo -e "${RED}----------------------------------------${NC}"
+  echo "  Remove secrets, add files to .gitignore, or"
+  echo "  use --no-verify only if you are CERTAIN it is safe."
+  exit 1
+fi
+
+exit 0
