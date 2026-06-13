@@ -1,5 +1,8 @@
 # Engineering Rules (Global — applies to all projects)
 
+## Git
+- Default branch is ALWAYS `master` — never `main`. Do not suggest renaming or use `main` in commands or examples.
+
 ## Code Quality
 - Never emit placeholders, `// TODO`, or truncated code blocks. All generated code must be complete and syntactically valid.
 - Prefer lightweight, single-responsibility structures. Do not over-engineer.
