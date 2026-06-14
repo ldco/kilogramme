@@ -7,53 +7,33 @@
   ],
   "mcp": {
     "context7": {
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@upstash/context7-mcp"
-      ]
+      "type": "remote",
+      "url": "http://127.0.0.1:8200/mcp",
+      "enabled": true
     },
     "sqlite": {
-      "type": "local",
-      "command": [
-        "npx",
-        "mcp-sqlite-server"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8201/mcp",
       "enabled": true
     },
     "puppeteer": {
-      "type": "local",
-      "command": [
-        "npx",
-        "puppeteer-mcp-claude",
-        "serve"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8202/mcp",
       "enabled": true
     },
     "puppetmaster": {
-      "type": "local",
-      "command": [
-        "npx",
-        "tsx",
-        "/home/ldco/.config/kilo/mcp-servers/puppetmaster/src/index.ts"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8203/mcp",
       "enabled": true
     },
     "tausik": {
-      "type": "local",
-      "command": [
-        "bash",
-        "/home/ldco/.kilo/mcp-servers/tausik/run-server.sh"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8204/mcp",
       "enabled": true
     },
     "git": {
-      "type": "local",
-      "command": [
-        "uvx",
-        "mcp-server-git"
-      ],
+      "type": "remote",
+      "url": "http://127.0.0.1:8205/mcp",
       "enabled": true
     }
   },

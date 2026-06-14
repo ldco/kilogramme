@@ -1,0 +1,13 @@
+[Unit]
+Description=Kilo MCP: Tausik (proxy @ :8204)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8204 -- bash %h/.kilo/mcp-servers/tausik/run-server.sh
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+Environment=PM_PROJECT_ROOT=%h
+
+[Install]
+WantedBy=default.target

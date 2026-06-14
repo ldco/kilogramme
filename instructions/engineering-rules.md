@@ -2,6 +2,7 @@
 
 ## Git
 - Default branch is ALWAYS `master` — never `main`. Do not suggest renaming or use `main` in commands or examples.
+- **NEVER push.** Commit only. Pushing requires an explicit user request. Never suggest pushing, never push automatically.
 
 ## Code Quality
 - Never emit placeholders, `// TODO`, or truncated code blocks. All generated code must be complete and syntactically valid.
@@ -37,3 +38,11 @@
 - No `any` types — use `unknown`, proper interfaces, or generics.
 - No `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, or `!` non-null assertions.
 - Discriminated unions with `type`/`status`/`kind` literal discriminators.
+
+### NVIDIA GSP Firmware
+- **On driver ≥610, NEVER disable GSP firmware (`NVreg_EnableGpuFirmware=0`)** — GSP handles VRAM preservation during suspend/resume. Without it, GPU memory corrupts on each wake cycle, producing irreversible visual artifacts on all displays.
+- ArchWiki GSP warnings are for older drivers (≤525). Not applicable to 610+.
+
+## Bash / System Scripts
+- **Sudo in automation:** Every bare `sudo` call after credential timeout (5 min) counts as a failed PAM auth — even with `2>/dev/null`. After 5 failures pam_faillock locks the user out. In daemon/systemd scripts, check `sudo -n -v` first; skip privileged ops if no cache.
+- GUI sudo prompts (`kdialog`, `zenity`, `SUDO_ASKPASS`) are fine for interactive use. Just don't let automated scripts retry them in a loop.

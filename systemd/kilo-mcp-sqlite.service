@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: SQLite (proxy @ :8201)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8201 -- /usr/bin/npx mcp-sqlite-server
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

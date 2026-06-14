@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: Context7 (proxy @ :8200)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8200 -- /usr/bin/npx -y @upstash/context7-mcp
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

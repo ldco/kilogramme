@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: Git (proxy @ :8205)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8205 -- %h/.local/bin/uvx mcp-server-git
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

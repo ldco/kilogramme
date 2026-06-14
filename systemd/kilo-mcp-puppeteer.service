@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: Puppeteer (proxy @ :8202)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8202 -- /usr/bin/npx puppeteer-mcp-claude serve
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target
