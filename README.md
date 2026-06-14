@@ -51,3 +51,7 @@ Requires: Node.js ≥ 20, `uvx` (for git MCP), DeepSeek API key, Voyage AI API k
 ## Full Tool Stack Reference
 
 See [docs/development-tool-stack.md](docs/development-tool-stack.md) for the complete infrastructure documentation (Russian).
+
+## Attribution
+
+This framework uses the [TAUSIK](https://github.com/Kibertum/tausik-core) project management system by [Andrey Yumashev](https://github.com/Kibertum) — a structured agentic workflow engine with epics, tasks, memory graphs, and quality gates.
