@@ -35,6 +35,11 @@
       "type": "remote",
       "url": "http://127.0.0.1:8205/mcp",
       "enabled": true
+    },
+    "ralph": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/ralph/src/index.ts"],
+      "enabled": true
     }
   },
   "indexing": {
@@ -57,19 +62,30 @@
   },
   "experimental": {
     "speech_to_text": true,
-    "speech_to_text_model": "openai/whisper-large-v3-turbo"
+    "speech_to_text_model": "openai/whisper-large-v3-turbo",
+    "openTelemetry": true
   },
   "permission": {
-    "bash": "allow",
-    "edit": "allow",
-    "read": "allow",
-    "glob": "allow",
-    "grep": "allow",
-    "webfetch": "allow",
-    "task": "allow",
-    "skill": "allow",
-    "external_directory": "allow",
-    "doom_loop": "allow"
+    "*": "allow",
+    "bash": {
+      "^(sudo\\s+)?rm\\s+-rf\\s+/\\s*$": "ask",
+      "^(sudo\\s+)?rm\\s+-rf\\s+/*\\s*$": "ask",
+      "^(sudo\\s+)?rm\\s+-rf\\s+~\\s*$": "ask",
+      "^(sudo\\s+)?rm\\s+-rf\\s+\\.\\s*$": "ask",
+      "^(sudo\\s+)?dd\\s+if=": "ask",
+      "^(sudo\\s+)?mkfs\\.|^(sudo\\s+)?fdisk|^(sudo\\s+)?parted|^(sudo\\s+)?mkswap": "ask",
+      "^[Dd][Rr][Oo][Pp]\\s+(DATABASE|TABLE|SCHEMA|INDEX)": "ask",
+      "^[Tt][Rr][Uu][Nn][Cc][Aa][Tt][Ee]\\b": "ask",
+      "^redis-cli\\b.*(FLUSHALL|FLUSHDB)": "ask",
+      "^mongo\\b.*db\\.dropDatabase": "ask",
+      "^(sudo\\s+)?chmod\\s+777\\s+/": "ask",
+      "^git\\s+push\\s+.*(--force|-f)\\b": "ask",
+      "*": "allow"
+    },
+    "edit": {
+      "(^|/)kilo\\.json$": "ask",
+      "*": "allow"
+    }
   },
   "agent": {
     "architect": {
