@@ -2,7 +2,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
@@ -23,6 +23,15 @@ interface HookHandler {
 }
 
 const HOOKS_CONFIG = join(homedir(), '.kilo', 'hooks.json')
+const CHANNELS_DIR = join(homedir(), '.kilo', 'channels')
+
+interface Message {
+  id: string
+  from: string
+  channel: string
+  message: string
+  timestamp: string
+}
 
 interface HooksConfig {
   hooks: Record<string, HookHandler[]>
@@ -134,6 +143,36 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       name: 'hooks_persist',
       description: 'Save current hooks to persistent config (.kilo/hooks.json).',
       inputSchema: { type: 'object', properties: {} }
+    },
+    {
+      name: 'channels_post',
+      description: 'Post a message to a channel. External tools can use this to send notifications, CI results, or alerts into the session.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          channel: { type: 'string', description: 'Channel name (e.g. ci, alerts, chat)' },
+          from: { type: 'string', description: 'Sender name (e.g. github-actions, slack-bot)' },
+          message: { type: 'string', description: 'Message content' }
+        },
+        required: ['channel', 'from', 'message']
+      }
+    },
+    {
+      name: 'channels_read',
+      description: 'Read pending messages from all channels. Returns messages posted since last read.',
+      inputSchema: { type: 'object', properties: {
+        channel: { type: 'string', description: 'Optional: filter by channel name' }
+      } }
+    },
+    {
+      name: 'channels_listen',
+      description: 'Start a background HTTP webhook server that accepts POST requests and writes them to channels. Returns the webhook URL.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          port: { type: 'number', description: 'Port to listen on (default: 9337)' }
+        }
+      }
     }
   ]
 }))
@@ -206,6 +245,89 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     case 'hooks_persist': {
       saveConfig(config)
       return { content: [{ type: 'text', text: JSON.stringify({ persisted: true }) }] }
+    }
+    case 'channels_post': {
+      const channel = args.channel as string
+      const from = args.from as string
+      const messageText = args.message as string
+      if (!existsSync(CHANNELS_DIR)) mkdirSync(CHANNELS_DIR, { recursive: true })
+      const msg: Message = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        from, channel, message: messageText,
+        timestamp: new Date().toISOString()
+      }
+      const inboxPath = join(CHANNELS_DIR, `${channel}.json`)
+      let inbox: Message[] = []
+      if (existsSync(inboxPath)) {
+        try { inbox = JSON.parse(readFileSync(inboxPath, 'utf-8')) } catch {}
+      }
+      inbox.push(msg)
+      writeFileSync(inboxPath, JSON.stringify(inbox, null, 2))
+      return { content: [{ type: 'text', text: JSON.stringify({ posted: true, id: msg.id, channel }) }] }
+    }
+    case 'channels_read': {
+      const filterChannel = args.channel as string | undefined
+      if (!existsSync(CHANNELS_DIR)) {
+        return { content: [{ type: 'text', text: JSON.stringify({ messages: [], count: 0 }) }] }
+      }
+      const allMessages: Message[] = []
+      const files = filterChannel
+        ? [`${filterChannel}.json`]
+        : (readdirSync(CHANNELS_DIR) as string[]).filter(f => f.endsWith('.json'))
+      for (const f of files) {
+        const fp = join(CHANNELS_DIR, f)
+        if (!existsSync(fp)) continue
+        try {
+          const msgs: Message[] = JSON.parse(readFileSync(fp, 'utf-8'))
+          allMessages.push(...msgs)
+          // Clear inbox after read
+          writeFileSync(fp, '[]')
+        } catch {}
+      }
+      allMessages.sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+      return { content: [{ type: 'text', text: JSON.stringify({ messages: allMessages, count: allMessages.length }) }] }
+    }
+    case 'channels_listen': {
+      const port = (args.port as number) || 9337
+      const webhookUrl = `http://127.0.0.1:${port}`
+      const http = require('node:http')
+      const server = http.createServer((req: any, res: any) => {
+        if (req.method === 'POST') {
+          let body = ''
+          req.on('data', (c: string) => body += c)
+          req.on('end', () => {
+            try {
+              const data = JSON.parse(body)
+              const channel = data.channel || 'webhook'
+              const from = data.from || 'webhook'
+              const messageText = data.message || data.text || JSON.stringify(data)
+              if (!existsSync(CHANNELS_DIR)) mkdirSync(CHANNELS_DIR, { recursive: true })
+              const msg: Message = {
+                id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                from, channel, message: messageText,
+                timestamp: new Date().toISOString()
+              }
+              const inboxPath = join(CHANNELS_DIR, `${channel}.json`)
+              let inbox: Message[] = []
+              if (existsSync(inboxPath)) {
+                try { inbox = JSON.parse(readFileSync(inboxPath, 'utf-8')) } catch {}
+              }
+              inbox.push(msg)
+              writeFileSync(inboxPath, JSON.stringify(inbox, null, 2))
+              res.writeHead(200, { 'Content-Type': 'application/json' })
+              res.end(JSON.stringify({ ok: true, id: msg.id }))
+            } catch (e) {
+              res.writeHead(400, { 'Content-Type': 'application/json' })
+              res.end(JSON.stringify({ ok: false, error: String(e) }))
+            }
+          })
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/plain' })
+          res.end(`kilo-channel-webhook running. POST JSON { channel, from, message } to this URL.\n`)
+        }
+      })
+      server.listen(port, '127.0.0.1')
+      return { content: [{ type: 'text', text: JSON.stringify({ listening: true, url: webhookUrl, port }) }] }
     }
     default:
       throw new Error(`Unknown tool: ${req.params.name}`)
