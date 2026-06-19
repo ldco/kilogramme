@@ -38,6 +38,10 @@ The following phrases are BANNED. If you catch yourself thinking any of these, i
 | "This is a minor issue" | "I want to do a lazy fix" | Minor issues get proper fixes too. No severity-based shortcuts. |
 | "It's low priority, so..." | "I'm about to hack it" | Priority affects ORDER of work, never QUALITY. Do it right. |
 | "Good enough for now" | "I'm shipping a hack" | Not "good enough." Correct. Ship correct code or don't ship. |
+| "Let's just disable this" | "I don't want to debug it" | Debug it. Find the root cause. Fix it. A disabled module is a broken module. |
+| "We can remove this for now" | "I want the problem to disappear" | Removing functionality to hide errors is not a fix. Fix the errors, keep the functionality. |
+| "Let's use X as a fallback/default" | "I don't want to implement Y properly" | If Y is required (e.g. translation), implement Y. Don't substitute with X to avoid the work. |
+| "This module/feature has issues" | "I want to skip it entirely" | It has issues — that means it needs fixing, not disabling. |
 
 **If you genuinely cannot fix something:** State the EXACT technical reason (not a vague excuse), what you tried, and what specific information or access you're missing. Then ask the user.
 
@@ -67,6 +71,19 @@ A workaround is any code that avoids fixing the actual problem by working around
 - **Catching and re-throwing with a different message to hide the real error** — Fix the original error
 - **Using `any` or type casting to bypass type errors** — Fix the types
 - **Adding special-case logic (if X then do Y differently) instead of fixing the general case** — Fix the general case
+
+### Nuclear workarounds — making problems disappear instead of fixing them:
+
+- **Disabling a module/feature/plugin because it has bugs** — Debug and fix the bugs. A disabled module is a broken module, not a fixed one.
+- **Removing functionality to eliminate errors** — Fix the errors. The functionality exists because users need it.
+- **Changing default language/locale instead of adding missing translations** — Translate the text. Every i18n key must exist in every active locale.
+- **Making a feature "optional" or behind a feature flag to avoid fixing it** — Fix the feature and ship it working.
+- **Downgrading a dependency to avoid adapting to breaking changes** — Adapt the code to the new version.
+- **Switching to a different approach to avoid debugging the current one** — Debug the current approach first. Only switch if it is fundamentally wrong (with evidence, not because debugging is hard).
+- **Changing config/settings to route around broken code paths** — Fix the code path. Config is not a bandage.
+- **Commenting out broken code and replacing with simpler version** — Fix the original code. Replacing with "simpler" means replacing with "does less."
+
+**The principle:** Making a problem invisible is not fixing it. If a module is disabled, the module is still broken. If text is shown in the wrong language, the translation is still missing. If a feature is removed, users still need it. FIX THE ACTUAL PROBLEM.
 
 ---
 

@@ -264,3 +264,49 @@ Core rule: severity determines WHEN you fix something, never HOW. A P3 bug gets 
 1. Edit `instructions/no-shortcuts.md` Section 2 — add 4 rows after "This is a complex area" row
 2. Edit `instructions/no-shortcuts.md` — add Section 10 after Section 9
 3. Commit: `docs: add severity-is-not-a-license-to-hack rule`
+
+---
+
+## Amendment 2: Nuclear Workarounds Ban (2026-06-19)
+
+### Problem
+Agent circumvents code-level "no workaround" rules by making architectural/config decisions that eliminate the problem instead of fixing it:
+- Disables a broken module instead of debugging it
+- Changes default language instead of translating text
+- Removes features that throw errors
+- Changes config to route around broken code paths
+
+### Changes Required
+
+**File: `instructions/no-shortcuts.md`**
+
+1. **Section 2 banned phrases table** — add 4 new "disable/remove/fallback" evasion phrases after "Good enough for now":
+
+| Banned Phrase | What It Really Means | What You Must Do Instead |
+|---|---|---|
+| "Let's just disable this" | "I don't want to debug it" | Debug it. Find the root cause. Fix it. A disabled module is a broken module. |
+| "We can remove this for now" | "I want the problem to disappear" | Removing functionality to hide errors is not a fix. Fix the errors, keep the functionality. |
+| "Let's use X as a fallback/default" | "I don't want to implement Y properly" | If Y is required (e.g. translation), implement Y. Don't substitute with X to avoid the work. |
+| "This module/feature has issues" | "I want to skip it entirely" | It has issues — that means it needs fixing, not disabling. |
+
+2. **Section 4 (NO WORKAROUNDS)** — add nuclear workaround subsection after existing patterns:
+
+```markdown
+### Nuclear workarounds — making problems disappear instead of fixing them:
+
+- **Disabling a module/feature/plugin because it has bugs** — Debug and fix the bugs. A disabled module is a broken module, not a fixed one.
+- **Removing functionality to eliminate errors** — Fix the errors. The functionality exists because users need it.
+- **Changing default language/locale instead of adding missing translations** — Translate the text. Every i18n key must exist in every active locale.
+- **Making a feature "optional" or behind a feature flag to avoid fixing it** — Fix the feature and ship it working.
+- **Downgrading a dependency to avoid adapting to breaking changes** — Adapt the code to the new version.
+- **Switching to a different approach to avoid debugging the current one** — Debug the current approach first. Only switch if it is fundamentally wrong (with evidence, not because debugging is hard).
+- **Changing config/settings to route around broken code paths** — Fix the code path. Config is not a bandage.
+- **Commenting out broken code and replacing with simpler version** — Fix the original code. Replacing with "simpler" means replacing with "does less."
+
+**The principle: Making a problem invisible is not fixing it.** If a module is disabled, the module is still broken. If text is shown in the wrong language, the translation is still missing. If a feature is removed, users still need it. FIX THE ACTUAL PROBLEM.
+```
+
+### Implementation Steps
+1. Edit `instructions/no-shortcuts.md` Section 2 — add 4 rows after "Good enough for now"
+2. Edit `instructions/no-shortcuts.md` Section 4 — add nuclear workarounds subsection
+3. Commit: `docs: ban nuclear workarounds (disabling/removing instead of fixing)`
