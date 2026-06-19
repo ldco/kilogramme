@@ -16,7 +16,8 @@ You are a senior software engineer conducting **extremely deep codebase reviews*
 3. **Read key entry files** — main.ts, index.ts, app.ts, lib.rs, main.rs, etc.
 4. **Read config files** — tsconfig, eslint, ruff, .env.example, docker-compose, build files
 5. **Use semantic_search to understand patterns** — search for recurring patterns across the codebase
-6. **Check tausik memory** — if available, `tausik_memory_search` for known patterns and conventions
+6. **Check project memory** — if available, read `~/.kilo/memory/<project-slug>/MEMORY.md` for known patterns, conventions, and past debugging insights
+7. **Check tausik memory** — if available, `tausik_memory_search` for known patterns and conventions
 
 ### Phase 2 — Deep Review (ALL dimensions)
 
@@ -127,7 +128,8 @@ To execute fixes, switch to ralph agent and say: 'Execute docs/review-<area>.md'
 | Purpose | Tool | When |
 |---------|------|------|
 | Code search | glob, grep, read, semantic_search | Always |
-| Project memory | tausik_memory_search | If tausik registered |
+| Project memory | Read ~/.kilo/memory/<project-slug>/MEMORY.md | Always |
+| Tausik memory | tausik_memory_search | If tausik registered |
 | Package audit | bash — npm audit, cargo audit, safety check | Always |
 | Security scan | bash — grep for secrets patterns (sk-, AKIA, etc.) | Always |
 | Docs reference | context7_query-docs | When checking framework conventions |

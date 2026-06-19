@@ -40,6 +40,51 @@
       "type": "local",
       "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/ralph/src/index.ts"],
       "enabled": true
+    },
+    "constitution": {
+      "type": "local",
+      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/constitution/dist/index.js"],
+      "enabled": true
+    },
+    "ncp-validator": {
+      "type": "local",
+      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/ncp-validator/dist/index.js"],
+      "enabled": true
+    },
+    "contract-guard": {
+      "type": "local",
+      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/contract-guard/dist/index.js"],
+      "enabled": true
+    },
+    "score-engine": {
+      "type": "local",
+      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/score-engine/dist/index.js"],
+      "enabled": true
+    },
+    "session-memory": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/session-memory/src/index.ts"],
+      "enabled": true
+    },
+    "hooks": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/hooks/src/index.ts"],
+      "enabled": true
+    },
+    "orchestrator": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/orchestrator/src/index.ts"],
+      "enabled": true
+    },
+    "plugin-registry": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/plugin-registry/src/index.ts"],
+      "enabled": true
+    },
+    "team-coordinator": {
+      "type": "local",
+      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/team-coordinator/src/index.ts"],
+      "enabled": true
     }
   },
   "indexing": {
@@ -54,7 +99,8 @@
   },
   "lsp": true,
   "instructions": [
-    "/home/ldco/.config/kilo/instructions/*.md"
+    "/home/ldco/.config/kilo/instructions/*.md",
+    "/home/ldco/.config/kilo/instructions/rules/*.md"
   ],
   "compaction": {
     "auto": true,
@@ -133,6 +179,35 @@
         "skill": "allow",
         "external_directory": "allow",
         "recall": "allow"
+      }
+    },
+    "ralph": {
+      "mode": "primary",
+      "description": "Executes PRDs iteratively — one story at a time. Verify, learn, commit, repeat.",
+      "path": "/home/ldco/.config/kilo/.kilo/agents/ralph.md",
+      "permission": {
+        "read": "allow", "glob": "allow", "grep": "allow", "semantic_search": "allow",
+        "webfetch": "allow", "edit": "allow", "bash": "allow", "mcp": "allow",
+        "skill": "allow", "doom_loop": "allow", "recall": "allow",
+        "external_directory": "allow", "question": "deny", "suggest": "deny", "todowrite": "allow"
+      }
+    },
+    "explore": {
+      "mode": "primary",
+      "description": "Fast read-only agent for codebase exploration — search, discover, analyze without making changes.",
+      "path": "/home/ldco/.config/kilo/.kilo/agents/explore.md",
+      "permission": {
+        "read": "allow", "glob": "allow", "grep": "allow", "semantic_search": "allow",
+        "bash": "allow", "write": "deny", "edit": "deny", "mcp": "allow", "recall": "allow"
+      }
+    },
+    "plan": {
+      "mode": "primary",
+      "description": "Planning research agent — gather context, analyze dependencies, propose implementation plans.",
+      "path": "/home/ldco/.config/kilo/.kilo/agents/plan.md",
+      "permission": {
+        "read": "allow", "glob": "allow", "grep": "allow", "semantic_search": "allow",
+        "bash": "allow", "write": "deny", "edit": "deny", "mcp": "allow"
       }
     }
   }

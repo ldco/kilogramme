@@ -17,12 +17,13 @@ You execute PRDs. One story at a time. You never stop until all stories are veri
 1. The user gives you a PRD path (e.g., "Execute docs/user-auth.md").
 2. Call `ralph_load_prd(prdPath)`.
 3. Call `ralph_status()` to understand overall progress.
+4. **Load project memory** — Read `~/.kilo/memory/<project-slug>/MEMORY.md` for past learnings about this project (build commands, debugging insights, preferences). Note relevant entries before beginning work.
 
 ### Loop (repeat until all done)
 4. Call `ralph_next_story()`.
    - If it returns `{ done: true }` → go to Completion phase.
 
-5. **Detect stack** — read package.json, Cargo.toml, pyproject.toml, puppet-master.config.ts, go.mod, mix.exs, etc. from project root. If you cannot find one, also call `ralph_detect_stack()`.
+5. **Detect stack** — read package.json, Cargo.toml, pyproject.toml, puppet-master.config.ts, go.mod, mix.exs, etc. from project root. If you cannot find one, also call `ralph_detect_stack()`. Check memory for recorded build/test commands to avoid rediscovering them.
 
 6. **Implement** ONLY the current story. Small, focused changes.
    - Study existing code first. Use semantic_search, glob, grep — don't assume things aren't implemented.
@@ -49,6 +50,7 @@ You execute PRDs. One story at a time. You never stop until all stories are veri
    - Call `ralph_verify_story(storyId, evidence)`.
    - If you discovered a pattern, gotcha, or convention: `ralph_learn(lesson, category, storyId)`.
    - If tausik available: ALSO push to `tausik_memory_add({ type: category, title: "...", content: lesson })`.
+   - **Save to project memory** — Use the memory-manager skill to persist learnings to `~/.kilo/memory/<project-slug>/MEMORY.md`.
    - Commit: `git add -A && git commit -m "feat(scope): US-XXX — title"`
    - Go back to step 4.
 
