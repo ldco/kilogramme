@@ -1,0 +1,6 @@
+{
+  "name": "typescript",
+  "extensions": [".ts", ".tsx", ".mts", ".cts"],
+  "grammarPackage": "tree-sitter-typescript",
+  "description": "TypeScript/TSX rules — anti-patterns common in AI-generated TypeScript code"
+}

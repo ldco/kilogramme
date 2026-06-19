@@ -1,0 +1,15 @@
+# CodeWhale Config Reference
+# These are the required settings for the workflow.
+# Apply with: codewhale config set <key> <value>
+# Or: codewhale login deepseek
+
+# Provider and model
+provider = "deepseek"
+default_text_model = "deepseek-v4-pro"
+
+# Auth mode
+auth.mode = "api_key"
+# providers.deepseek.api_key = "sk-..."  # set via: codewhale login deepseek
+
+# Trust your project directory (run from project root)
+# codewhale config set projects."$(pwd)".trust_level trusted

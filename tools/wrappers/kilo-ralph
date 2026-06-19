@@ -1,0 +1,25 @@
+#!/bin/bash
+# kilo-ralph: Ralph TUI → Kilo argument adapter
+# Ralph passes flags BEFORE "run" (opencode convention), Kilo needs them AFTER.
+# Example input:  --dangerously-skip-permissions --thinking run --format json "prompt"
+# Example output: kilo run --dangerously-skip-permissions --thinking --format json "prompt"
+
+pre_run=()
+post_run=()
+found_run=false
+
+for arg in "$@"; do
+    if [ "$arg" = "run" ]; then
+        found_run=true
+    elif [ "$found_run" = true ]; then
+        post_run+=("$arg")
+    else
+        pre_run+=("$arg")
+    fi
+done
+
+if [ "$found_run" = true ]; then
+    exec kilo run "${pre_run[@]}" "${post_run[@]}"
+else
+    exec kilo "$@"
+fi

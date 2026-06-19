@@ -1,0 +1,11 @@
+configVersion = "2.1"
+maxIterations = 10
+agent = "opencode"
+tracker = "json"
+autoCommit = false
+model = "deepseek"
+
+[agentOptions]
+[trackerOptions]
+[notifications]
+sound = "off"

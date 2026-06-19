@@ -1,0 +1,6 @@
+maxIterations = 0
+iterationDelay = 2000
+outputDir = ".ralph-tui/iterations"
+autoCommit = true
+progressFile = ".ralph-tui/progress.md"
+configVersion = "2.1"

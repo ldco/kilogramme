@@ -1,0 +1,42 @@
+const en = {
+  ncpValidator: {
+    tool: {
+      validate: { name: 'ncp_validate', description: 'Validate an NCP spec file against schema.' },
+      list: { name: 'ncp_list', description: 'List all NCP files in the project.' },
+      diff: { name: 'ncp_diff', description: 'Diff two NCP specs for breaking changes.' },
+    },
+    validate: { inputPath: 'File path' },
+    diff: { inputOld: 'Old file path', inputNew: 'New file path' },
+    error: {
+      fileNotFound: 'File not found: {path}',
+      missingProtocol: 'Missing required field: protocol',
+      missingModule: 'Missing required field: module',
+      missingVersion: 'Missing required field: version',
+      missingEntities: 'Missing required field: entities (must be an object)',
+      invalidProtocol: 'Invalid protocol: "{proto}". Expected one of: {expected}',
+      entityNoFields: 'Entity "{name}" missing "fields"',
+      entityFieldNoType: 'Entity "{name}" field "{fname}" missing type',
+      entityFieldBadType: 'Entity "{name}" field "{fname}" invalid type "{type}". Valid: {valid}',
+      endpointNoReqRes: 'Endpoint "{path}" has no request or response',
+      emptyFile: 'File is empty or not valid YAML',
+      parseError: 'Parse error: {error}',
+      oldFileError: 'Old file: {errors}',
+      newFileError: 'New file: {errors}',
+    },
+    diffLabels: {
+      entityAdded: 'entity_added',
+      entityRemoved: 'entity_removed',
+      fieldRemoved: 'field_removed',
+      fieldBecameOptional: 'field_became_optional',
+      fieldTypeChanged: 'field_type_changed',
+      fieldAdded: 'field_added',
+      typeEntityAdded: 'Entity added: {name}',
+      typeEntityRemoved: 'Entity removed: {name}',
+      typeFieldRemoved: 'Field removed: {entity}.{field}',
+      typeFieldBecameOptional: 'Field became optional: {entity}.{field}',
+      typeFieldTypeChanged: 'Field type changed: {entity}.{field} from {from} to {to}',
+      typeFieldAdded: 'Field added: {entity}.{field}',
+    },
+  },
+}
+export default en

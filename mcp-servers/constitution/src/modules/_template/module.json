@@ -1,0 +1,6 @@
+{
+  "name": "template",
+  "extensions": [".ext"],
+  "grammarPackage": "tree-sitter-<language>",
+  "description": "Template — copy this directory to add a new language module"
+}

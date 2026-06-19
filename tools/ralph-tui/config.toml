@@ -1,0 +1,17 @@
+# Ralph TUI + Kilo integration
+# Uses opencode plugin pointed at kilo-ralph wrapper script
+# The wrapper fixes argument ordering: Kilo needs flags AFTER "run" subcommand
+
+defaultAgent = "kilo"
+
+[[agents]]
+name = "kilo"
+plugin = "opencode"
+default = true
+command = "/home/ldco/.local/bin/kilo-ralph"
+defaultFlags = ["--dangerously-skip-permissions", "--thinking"]
+options = { model = "deepseek/deepseek-v4-pro", agent = "general" }
+
+[errorHandling]
+strategy = "skip"
+maxRetries = 2

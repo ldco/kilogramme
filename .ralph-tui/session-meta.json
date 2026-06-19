@@ -1,0 +1,15 @@
+{
+  "id": "af725347-1e36-49c8-941f-4c51cee480e2",
+  "status": "completed",
+  "startedAt": "2026-06-14T22:40:59.369Z",
+  "updatedAt": "2026-06-14T23:03:04.018Z",
+  "agentPlugin": "opencode",
+  "trackerPlugin": "json",
+  "executionScopes": [],
+  "currentIteration": 0,
+  "maxIterations": 10,
+  "totalTasks": 0,
+  "tasksCompleted": 0,
+  "cwd": "/home/ldco/.config/kilo",
+  "endedAt": "2026-06-14T23:03:04.018Z"
+}

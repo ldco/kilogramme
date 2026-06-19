@@ -1,0 +1,79 @@
+#!/bin/bash
+# kilo-prd: Generate a Ralph TUI-compatible prd.json from a natural language description
+# Usage: kilo-prd "Build a user authentication system with 2FA"
+
+set -e
+
+DESCRIPTION="${1:?Usage: kilo-prd <description of what to build>}"
+OUTPUT="${2:-prd.json}"
+
+PROMPT="You are a technical project manager. Based on the following description, create a structured task list in valid JSON format compatible with Ralph TUI's prd.json schema.
+
+DESCRIPTION:
+$DESCRIPTION
+
+OUTPUT FORMAT (valid JSON only, no markdown, no explanation):
+{
+  \"tasks\": [
+    {
+      \"id\": \"task-01\",
+      \"title\": \"Short task title\",
+      \"description\": \"Detailed implementation instructions\",
+      \"acceptance_criteria\": [\"AC 1\", \"AC 2\"],
+      \"priority\": \"high\",
+      \"dependencies\": []
+    }
+  ]
+}
+
+RULES:
+- Break the work into 5-15 atomic tasks
+- Each task should be completable in one session
+- Order tasks by dependency (foundational first)
+- Set priority: high/medium/low
+- Mark task-to-task dependencies by ID
+- Include specific file paths and technical details in descriptions
+- 20-50 word descriptions per task
+- Output ONLY valid JSON, no other text"
+
+echo "Generating PRD for: $DESCRIPTION"
+echo ""
+
+kilo run --dangerously-skip-permissions --format json "$PROMPT" 2>/dev/null | python3 -c "
+import sys, json
+# Extract the last JSON object from the output stream
+text = sys.stdin.read()
+# Try to find JSON in the output
+try:
+    # Look for JSON between triple backticks or raw
+    if '\`\`\`json' in text:
+        start = text.index('\`\`\`json') + 7
+        end = text.index('\`\`\`', start)
+        json_str = text[start:end].strip()
+    elif '\`\`\`' in text:
+        start = text.index('\`\`\`') + 3
+        end = text.index('\`\`\`', start)
+        json_str = text[start:end].strip()
+    else:
+        # Try to find a raw JSON object
+        brace_start = text.find('{')
+        brace_end = text.rfind('}')
+        if brace_start >= 0 and brace_end > brace_start:
+            json_str = text[brace_start:brace_end+1]
+        else:
+            json_str = text
+    
+    data = json.loads(json_str)
+    with open('$OUTPUT', 'w') as f:
+        json.dump(data, f, indent=2)
+    print(f'Created $OUTPUT with {len(data.get(\"tasks\", data if isinstance(data, list) else []))} tasks')
+except Exception as e:
+    print(f'Error parsing output: {e}')
+    print('Raw output saved to $OUTPUT.raw.txt')
+    with open('$OUTPUT.raw.txt', 'w') as f:
+        f.write(text)
+"
+
+echo ""
+echo "Next: ralph-tui run --prd ./$OUTPUT"
+echo "      ralph-tui        (interactive TUI)"

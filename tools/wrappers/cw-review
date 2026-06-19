@@ -1,0 +1,43 @@
+#!/bin/bash
+# cw-review: CodeWhale-based interactive code review (different tool, different eye)
+# Opens an interactive CodeWhale session with a review methodology pre-loaded.
+# The reviewer reads the codebase and writes findings-cw.md — never edits source.
+#
+# Usage:
+#   cw-review                 Review entire current directory
+#   cw-review src/auth        Review specific directory
+#   cw-review api             Review only API module
+
+set -e
+
+PROMPT_FILE="${CW_REVIEW_PROMPT:-$HOME/.config/codewhale/review-prompt.md}"
+SCOPE="${1:-entire project}"
+
+if [ ! -f "$PROMPT_FILE" ]; then
+    echo "ERROR: Review prompt template not found at $PROMPT_FILE"
+    exit 1
+fi
+
+# Write combined prompt to temp file for clean interactive launch
+TMP_PROMPT=$(mktemp /tmp/cw-review-XXXXXX)
+trap "rm -f $TMP_PROMPT" EXIT
+
+{
+    cat "$PROMPT_FILE"
+    echo ""
+    echo "## SCOPE"
+    echo ""
+    echo "Review the code in: $SCOPE"
+    echo ""
+    echo "## START"
+    echo ""
+    echo "Read the codebase. Understand it. Find everything wrong."
+    echo "Write your findings to findings-cw.md at the end. Never edit source files."
+} > "$TMP_PROMPT"
+
+echo "=== CodeWhale Interactive Review ==="
+echo "Scope: $SCOPE"
+echo "Rules: no editing, findings → findings-cw.md"
+echo ""
+
+exec codewhale "$(cat "$TMP_PROMPT")"

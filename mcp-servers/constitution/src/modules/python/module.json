@@ -1,0 +1,6 @@
+{
+  "name": "python",
+  "extensions": [".py"],
+  "grammarPackage": "tree-sitter-python",
+  "description": "Python rules — anti-patterns common in AI-generated Python code"
+}

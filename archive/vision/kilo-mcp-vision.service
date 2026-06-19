@@ -1,0 +1,13 @@
+[Unit]
+Description=Kilo MCP: Vision (proxy @ :8206)
+After=network-online.target ollama.service
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8206 -- %h/.npm-global/bin/tsx %h/.config/kilo/mcp-servers/vision/src/index.ts
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+Environment=OLLAMA_URL=http://127.0.0.1:11434
+
+[Install]
+WantedBy=default.target
