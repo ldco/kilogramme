@@ -34,6 +34,10 @@ The following phrases are BANNED. If you catch yourself thinking any of these, i
 | "This would be too risky to change" | "I'm afraid of breaking things" | That's what tests are for. Make the change, run the tests. |
 | "A quick fix would be..." | "Incoming hack" | No quick fixes. Correct fixes only. |
 | "This is a complex area" | "I didn't read the code carefully enough" | Read it again. Understand it fully. Then fix it properly. |
+| "It's not critical" | "I want to cut corners" | Every issue gets the same quality standard. Fix it properly. |
+| "This is a minor issue" | "I want to do a lazy fix" | Minor issues get proper fixes too. No severity-based shortcuts. |
+| "It's low priority, so..." | "I'm about to hack it" | Priority affects ORDER of work, never QUALITY. Do it right. |
+| "Good enough for now" | "I'm shipping a hack" | Not "good enough." Correct. Ship correct code or don't ship. |
 
 **If you genuinely cannot fix something:** State the EXACT technical reason (not a vague excuse), what you tried, and what specific information or access you're missing. Then ask the user.
 
@@ -124,3 +128,25 @@ When making a non-obvious implementation choice, state:
 - **What trade-off** you're accepting
 
 This prevents stealth hacks — if you can't justify the approach, it's probably wrong.
+
+---
+
+## 10. SEVERITY IS NOT A LICENSE TO HACK
+
+**If it's not as it should be — it's a problem. Period.**
+
+- **Severity determines WHEN you fix something, never HOW.**
+  A P3 bug gets the same quality fix as a P1 bug. The only difference is order.
+- **"Not critical" is NEVER a reason to:**
+  - Use a workaround instead of a proper fix
+  - Skip edge cases or error handling
+  - Write lower-quality code
+  - Leave it half-done
+  - Do it the fast/dirty way
+- **Every issue, regardless of severity, must be fixed:**
+  - With the same code quality as a critical issue
+  - By addressing the root cause
+  - With full verification
+  - In a way that would survive a senior engineer's review
+- **The test:** Would you write THIS code for a P1 production outage?
+  If no — rewrite it. The code doesn't know its own priority level.

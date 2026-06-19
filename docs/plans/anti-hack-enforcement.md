@@ -235,3 +235,32 @@ After implementing all three files:
 3. Add "No Workarounds" section to `engineering-rules.md` (File 3)
 4. Commit: `docs: add anti-hack behavioral enforcement rules`
 5. Verify by opening a new session — the instruction should auto-load
+
+---
+
+## Amendment 1: "Not Critical" Excuse Ban (2026-06-19)
+
+### Problem
+Agent uses severity/priority as an excuse to cut corners: "it's not critical" → lower quality fix, workaround, or deferral.
+
+### Changes Required
+
+**File: `instructions/no-shortcuts.md`**
+
+1. **Section 2 banned phrases table** — add 4 rows:
+
+| Banned Phrase | What It Really Means | What You Must Do Instead |
+|---|---|---|
+| "It's not critical" | "I want to cut corners" | Every issue gets the same quality standard. Fix it properly. |
+| "This is a minor issue" | "I want to do a lazy fix" | Minor issues get proper fixes too. No severity-based shortcuts. |
+| "It's low priority, so..." | "I'm about to hack it" | Priority affects ORDER of work, never QUALITY. Do it right. |
+| "Good enough for now" | "I'm shipping a hack" | Not "good enough." Correct. Ship correct code or don't ship. |
+
+2. **Add new Section 10** — "SEVERITY IS NOT A LICENSE TO HACK"
+
+Core rule: severity determines WHEN you fix something, never HOW. A P3 bug gets the same quality fix as a P1 bug.
+
+### Implementation Steps
+1. Edit `instructions/no-shortcuts.md` Section 2 — add 4 rows after "This is a complex area" row
+2. Edit `instructions/no-shortcuts.md` — add Section 10 after Section 9
+3. Commit: `docs: add severity-is-not-a-license-to-hack rule`
