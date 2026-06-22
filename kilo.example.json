@@ -37,8 +37,8 @@
       "enabled": true
     },
     "ralph": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/ralph/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8210/mcp",
       "enabled": true
     },
     "constitution": {
@@ -62,28 +62,28 @@
       "enabled": true
     },
     "session-memory": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/session-memory/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8211/mcp",
       "enabled": true
     },
     "hooks": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/hooks/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8212/mcp",
       "enabled": true
     },
     "orchestrator": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/orchestrator/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8213/mcp",
       "enabled": true
     },
     "plugin-registry": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/plugin-registry/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8214/mcp",
       "enabled": true
     },
     "team-coordinator": {
-      "type": "local",
-      "command": ["npx", "tsx", "/home/ldco/.config/kilo/mcp-servers/team-coordinator/src/index.ts"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8215/mcp",
       "enabled": true
     }
   },

@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: Workflow Orchestrator (@ :8213)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8213 -- node %h/.config/kilo/mcp-servers/orchestrator/dist/index.js
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target
