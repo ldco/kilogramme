@@ -2,7 +2,7 @@
 
 **Purpose:** This document tells the fork agent EXACTLY what to do. It covers three repos, what to keep, what to port, what to add, and what to remove.
 
-**Date:** 2026-06-19
+**Date:** 2026-06-22 (updated: all 6 npx tsx MCPs → remote daemons)
 **Status:** Ready for execution
 
 ---
@@ -180,26 +180,28 @@ MiMo-Code is at `github.com/XiaomiMiMo/MiMo-Code`. Its core source is in `packag
 | **score-engine** | local | 4 | 90 | NoCowboy quality scoring: score_compute, score_breakdown, score_badge, score_history |
 | **contract-guard** | local | 2 | 87 | API contract breaking-change detection: contract_check, contract_status |
 | **ncp-validator** | local | 3 | 112 | NCP spec validation: ncp_validate, ncp_list, ncp_diff |
-| **ralph** | local | 8 | 43 | PRD state machine: load_prd, next_story, verify_story, block_story, learn, status, complete, detect_stack |
+| **ralph** | :8210 (remote) | 8 | 43 | PRD state machine: load_prd, next_story, verify_story, block_story, learn, status, complete, detect_stack |
 | **puppetmaster** | :8203 (remote) | 26 | 50 | PM framework operations: pm_dev, pm_build, pm_deploy, pm_config_*, pm_db_*, pm_lint, pm_test, pm_review_*, pm_contribute_*, pm_knowledge |
 | **context7** | :8200 (remote) | 2 | external | Version-specific docs for 20K+ libraries |
 | **sqlite** | :8201 (remote) | 5 | external | Direct SQLite database access |
 | **puppeteer** | :8202 (remote) | 15+ | external | Browser automation |
 | **git** | :8205 (remote) | 10+ | external | Structured git operations |
 
-**Registration:** These connect via `kilo.json` MCP config section. The 6 remote servers run as systemd user services behind `mcp-proxy` HTTP endpoints (ports 8200-8205). Local servers run via `npx tsx` or `node`.
+**Registration:** These connect via `kilo.json` MCP config section. All servers run as systemd user services behind `mcp-proxy` HTTP endpoints (ports 8200-8205, 8210-8215). The remaining 4 local servers (constitution, score-engine, contract-guard, ncp-validator) run via `node dist/index.js` — they're small and share the session's Node process.
 
-**Infrastructure:** See `~/.config/kilo/systemd/` for 6 systemd service files and `scripts/setup-mcp-daemons.sh` for the setup script.
+**Infrastructure:** See `~/.config/kilo/systemd/` for 12 systemd service files.
 
 ### 4.2 MCP Servers — REMOVE these (replaced by native MiMo features)
 
-| Server | Replaced By | Reason |
-|--------|-------------|--------|
-| **session-memory** (237 LOC) | MiMo `src/memory/` | Native memory is auto-injected, has checkpoints, budgeted injection. Our file-based MCP requires agent to manually call tools. |
-| **orchestrator** (214 LOC) | MiMo `src/workflow/` | Native workflow has sandbox, persistence, compose skills. Our MCP spawns blind `kilo -p` processes. |
-| **team-coordinator** (197 LOC) | MiMo `src/team/` or Kilo Agent Manager | Native team coordination or Kilo's worktree-based parallel sessions are superior. |
-| **plugin-registry** (155 LOC) | Kilo's native plugin system + MCP marketplace | Kilo already has a plugin system and marketplace. |
-| **hooks** (341 LOC) — **PARTIALLY KEEP** | Keep for channels tools (`channels_post`, `channels_read`, `channels_listen`). Hook tools (`hooks_register`, `hooks_fire`, etc.) are redundant if Kilo gets native hooks. |
+These currently run as remote daemons (ports 8211-8215, pre-built to JS, zero tsx overhead) but should be removed from the fork:
+
+| Server (current port) | Replaced By | Reason |
+|-----------------------|-------------|--------|
+| **session-memory** (:8211) | MiMo `src/memory/` | Native memory is auto-injected, has checkpoints, budgeted injection. Our file-based MCP requires agent to manually call tools. |
+| **orchestrator** (:8213) | MiMo `src/workflow/` | Native workflow has sandbox, persistence, compose skills. Our MCP spawns blind `kilo -p` processes. |
+| **team-coordinator** (:8215) | MiMo `src/team/` or Kilo Agent Manager | Native team coordination or Kilo's worktree-based parallel sessions are superior. |
+| **plugin-registry** (:8214) | Kilo's native plugin system + MCP marketplace | Kilo already has a plugin system and marketplace. |
+| **hooks** (:8212) — **PARTIALLY KEEP** | Keep for channels tools (`channels_post`, `channels_read`, `channels_listen`). Hook tools (`hooks_register`, `hooks_fire`, etc.) are redundant if Kilo gets native hooks. |
 
 ### 4.3 Instructions — KEEP ALL (13 files + 3 rules)
 
@@ -391,13 +393,12 @@ git clone https://github.com/XiaomiMiMo/MiMo-Code.git /tmp/mimo-reference
 ### Step 8: Register Our MCP Servers
 1. Copy MCP server sources from `~/.config/kilo/mcp-servers/` to fork's config
 2. Register in fork's config format (same as kilo.json `mcp` section):
-   - Remote: tausik (:8204), puppetmaster (:8203), context7 (:8200), sqlite (:8201), puppeteer (:8202), git (:8205)
-   - Local: constitution, score-engine, contract-guard, ncp-validator, ralph
+   - Remote (existing): tausik (:8204), puppetmaster (:8203), context7 (:8200), sqlite (:8201), puppeteer (:8202), git (:8205)
+   - Remote (new — pre-built, systemd): ralph (:8210)
+   - Local: constitution, score-engine, contract-guard, ncp-validator
 3. Copy systemd service files from `~/.config/kilo/systemd/`
-4. Copy `scripts/setup-mcp-daemons.sh`
-5. **DO NOT register:** session-memory, orchestrator, team-coordinator, plugin-registry (removed)
-6. **PARTIAL:** hooks MCP — keep only if channels tools are needed (otherwise remove)
-7. Test: all MCP servers connect and respond to `tools/list`
+4. **DO NOT register:** session-memory (:8211), hooks (:8212), orchestrator (:8213), plugin-registry (:8214), team-coordinator (:8215) — removed from fork (kept running locally as daemons only during transition)
+5. Test: all MCP servers connect and respond to `tools/list`
 
 ### Step 9: Port Instructions, Commands, Agents, Skills
 1. Copy `instructions/*.md` + `instructions/rules/*.md` → fork's instructions dir
@@ -450,20 +451,20 @@ instructions/           → 13 instruction files + 3 rules
 commands/               → 16 slash commands
 .kilo/agents/           → 5 agent definitions (+ architect inline in kilo.json)
 mcp-servers/            → 11 MCP server source directories
-  constitution/         → AST code rules (51 LOC)
-  contract-guard/       → API contract check (87 LOC)
-  hooks/                → Hooks + channels (341 LOC)
-  ncp-validator/        → NCP spec validation (112 LOC)
-  orchestrator/         → Workflow orchestrator (214 LOC) — REMOVE after fork
-  plugin-registry/      → Plugin marketplace (155 LOC) — REMOVE after fork
-  puppetmaster/         → PM framework ops (50 LOC)
-  ralph/                → PRD state machine (43 LOC)
-  score-engine/         → NoCowboy scoring (90 LOC)
-  session-memory/       → Session memory (237 LOC) — REMOVE after fork
-  team-coordinator/     → Team coordination (197 LOC) — REMOVE after fork
-systemd/                → 6 systemd service files
+  constitution/         → AST code rules (51 LOC) — local, node dist/
+  contract-guard/       → API contract check (87 LOC) — local, node dist/
+  hooks/                → Hooks + channels (341 LOC) — remote :8212 (systemd/mcp-proxy) — REMOVE after fork
+  ncp-validator/        → NCP spec validation (112 LOC) — local, node dist/
+  orchestrator/         → Workflow orchestrator (214 LOC) — remote :8213 — REMOVE after fork
+  plugin-registry/      → Plugin marketplace (155 LOC) — remote :8214 — REMOVE after fork
+  puppetmaster/         → PM framework ops (50 LOC) — remote :8203
+  ralph/                → PRD state machine (43 LOC) — remote :8210 (systemd/mcp-proxy)
+  score-engine/         → NoCowboy scoring (90 LOC) — local, node dist/
+  session-memory/       → Session memory (237 LOC) — remote :8211 — REMOVE after fork
+  team-coordinator/     → Team coordination (197 LOC) — remote :8215 — REMOVE after fork
+systemd/                → 12 systemd service files (6 existing ports 8200-8205 + 6 new ports 8210-8215)
 scripts/                → Setup scripts
-kilo.json               → Main config (16 MCPs, 6 agents, 2 instruction globs, 3 plugins)
+kilo.json               → Main config (16 MCPs: 12 remote, 4 local node; 6 agents, 2 instruction globs, 3 plugins)
 kilo.example.json       → Template without secrets
 ```
 
