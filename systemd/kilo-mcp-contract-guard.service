@@ -1,0 +1,12 @@
+[Unit]
+Description=Kilo MCP: Contract Guard (@ :8218)
+After=network-online.target
+
+[Service]
+ExecStart=%h/.npm-global/bin/mcp-proxy --port 8218 -- node %h/.config/kilo/mcp-servers/contract-guard/dist/index.js
+Restart=on-failure
+RestartSec=5
+Environment=PATH=%h/.npm-global/bin:%h/.local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target

@@ -42,23 +42,23 @@
       "enabled": true
     },
     "constitution": {
-      "type": "local",
-      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/constitution/dist/index.js"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8216/mcp",
       "enabled": true
     },
     "ncp-validator": {
-      "type": "local",
-      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/ncp-validator/dist/index.js"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8217/mcp",
       "enabled": true
     },
     "contract-guard": {
-      "type": "local",
-      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/contract-guard/dist/index.js"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8218/mcp",
       "enabled": true
     },
     "score-engine": {
-      "type": "local",
-      "command": ["node", "/home/ldco/.config/kilo/mcp-servers/score-engine/dist/index.js"],
+      "type": "remote",
+      "url": "http://127.0.0.1:8219/mcp",
       "enabled": true
     },
     "session-memory": {

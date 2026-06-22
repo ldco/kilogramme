@@ -2,7 +2,7 @@
 
 **Purpose:** This document tells the fork agent EXACTLY what to do. It covers three repos, what to keep, what to port, what to add, and what to remove.
 
-**Date:** 2026-06-22 (updated: all 6 npx tsx MCPs → remote daemons)
+**Date:** 2026-06-22 (all 16 MCP servers now remote daemons)
 **Status:** Ready for execution
 
 ---
@@ -176,10 +176,10 @@ MiMo-Code is at `github.com/XiaomiMiMo/MiMo-Code`. Its core source is in `packag
 | Server | Port | Tools | LOC | Purpose |
 |--------|------|-------|-----|---------|
 | **tausik** | :8204 (remote) | 70+ | external | Project management: epics/stories/tasks, memory graph, QA gates, sessions, roles, stacks, decisions, explorations, dead ends, verify, audit |
-| **constitution** | local | 4 | 51 | AST-based code quality rules: check_file, check_project, list_rules, status |
-| **score-engine** | local | 4 | 90 | NoCowboy quality scoring: score_compute, score_breakdown, score_badge, score_history |
-| **contract-guard** | local | 2 | 87 | API contract breaking-change detection: contract_check, contract_status |
-| **ncp-validator** | local | 3 | 112 | NCP spec validation: ncp_validate, ncp_list, ncp_diff |
+| **constitution** | :8216 (remote) | 4 | 51 | AST-based code quality rules: check_file, check_project, list_rules, status |
+| **score-engine** | :8219 (remote) | 4 | 90 | NoCowboy quality scoring: score_compute, score_breakdown, score_badge, score_history |
+| **contract-guard** | :8218 (remote) | 2 | 87 | API contract breaking-change detection: contract_check, contract_status |
+| **ncp-validator** | :8217 (remote) | 3 | 112 | NCP spec validation: ncp_validate, ncp_list, ncp_diff |
 | **ralph** | :8210 (remote) | 8 | 43 | PRD state machine: load_prd, next_story, verify_story, block_story, learn, status, complete, detect_stack |
 | **puppetmaster** | :8203 (remote) | 26 | 50 | PM framework operations: pm_dev, pm_build, pm_deploy, pm_config_*, pm_db_*, pm_lint, pm_test, pm_review_*, pm_contribute_*, pm_knowledge |
 | **context7** | :8200 (remote) | 2 | external | Version-specific docs for 20K+ libraries |
@@ -187,9 +187,9 @@ MiMo-Code is at `github.com/XiaomiMiMo/MiMo-Code`. Its core source is in `packag
 | **puppeteer** | :8202 (remote) | 15+ | external | Browser automation |
 | **git** | :8205 (remote) | 10+ | external | Structured git operations |
 
-**Registration:** These connect via `kilo.json` MCP config section. All servers run as systemd user services behind `mcp-proxy` HTTP endpoints (ports 8200-8205, 8210-8215). The remaining 4 local servers (constitution, score-engine, contract-guard, ncp-validator) run via `node dist/index.js` — they're small and share the session's Node process.
+**Registration:** These connect via `kilo.json` MCP config section. All 16 servers run as systemd user services behind `mcp-proxy` HTTP endpoints (ports 8200-8219).
 
-**Infrastructure:** See `~/.config/kilo/systemd/` for 12 systemd service files.
+**Infrastructure:** See `~/.config/kilo/systemd/` for 16 systemd service files.
 
 ### 4.2 MCP Servers — REMOVE these (replaced by native MiMo features)
 
@@ -394,10 +394,8 @@ git clone https://github.com/XiaomiMiMo/MiMo-Code.git /tmp/mimo-reference
 1. Copy MCP server sources from `~/.config/kilo/mcp-servers/` to fork's config
 2. Register in fork's config format (same as kilo.json `mcp` section):
    - Remote (existing): tausik (:8204), puppetmaster (:8203), context7 (:8200), sqlite (:8201), puppeteer (:8202), git (:8205)
-   - Remote (new — pre-built, systemd): ralph (:8210)
-   - Local: constitution, score-engine, contract-guard, ncp-validator
-3. Copy systemd service files from `~/.config/kilo/systemd/`
-4. **DO NOT register:** session-memory (:8211), hooks (:8212), orchestrator (:8213), plugin-registry (:8214), team-coordinator (:8215) — removed from fork (kept running locally as daemons only during transition)
+   - Remote (systemd/mcp-proxy): ralph (:8210), constitution (:8216), ncp-validator (:8217), contract-guard (:8218), score-engine (:8219)
+   - **DO NOT register:** session-memory (:8211), hooks (:8212), orchestrator (:8213), plugin-registry (:8214), team-coordinator (:8215)
 5. Test: all MCP servers connect and respond to `tools/list`
 
 ### Step 9: Port Instructions, Commands, Agents, Skills
@@ -451,20 +449,20 @@ instructions/           → 13 instruction files + 3 rules
 commands/               → 16 slash commands
 .kilo/agents/           → 5 agent definitions (+ architect inline in kilo.json)
 mcp-servers/            → 11 MCP server source directories
-  constitution/         → AST code rules (51 LOC) — local, node dist/
-  contract-guard/       → API contract check (87 LOC) — local, node dist/
-  hooks/                → Hooks + channels (341 LOC) — remote :8212 (systemd/mcp-proxy) — REMOVE after fork
-  ncp-validator/        → NCP spec validation (112 LOC) — local, node dist/
+  constitution/         → AST code rules (51 LOC) — remote :8216 (systemd/mcp-proxy)
+  contract-guard/       → API contract check (87 LOC) — remote :8218
+  hooks/                → Hooks + channels (341 LOC) — remote :8212 — REMOVE after fork
+  ncp-validator/        → NCP spec validation (112 LOC) — remote :8217
   orchestrator/         → Workflow orchestrator (214 LOC) — remote :8213 — REMOVE after fork
   plugin-registry/      → Plugin marketplace (155 LOC) — remote :8214 — REMOVE after fork
   puppetmaster/         → PM framework ops (50 LOC) — remote :8203
-  ralph/                → PRD state machine (43 LOC) — remote :8210 (systemd/mcp-proxy)
-  score-engine/         → NoCowboy scoring (90 LOC) — local, node dist/
+  ralph/                → PRD state machine (43 LOC) — remote :8210
+  score-engine/         → NoCowboy scoring (90 LOC) — remote :8219
   session-memory/       → Session memory (237 LOC) — remote :8211 — REMOVE after fork
   team-coordinator/     → Team coordination (197 LOC) — remote :8215 — REMOVE after fork
-systemd/                → 12 systemd service files (6 existing ports 8200-8205 + 6 new ports 8210-8215)
+systemd/                → 16 systemd service files (ports 8200-8205, 8210-8219)
 scripts/                → Setup scripts
-kilo.json               → Main config (16 MCPs: 12 remote, 4 local node; 6 agents, 2 instruction globs, 3 plugins)
+kilo.json               → Main config (16 MCPs: all remote; 6 agents, 2 instruction globs, 3 plugins)
 kilo.example.json       → Template without secrets
 ```
 
