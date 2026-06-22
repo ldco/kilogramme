@@ -49,7 +49,17 @@ These exist in the Kilocode source. They are the reason we fork Kilo, not MiMo.
 | Tree-sitter | AST parsing for code understanding |
 | Nix support | `flake.nix` for reproducible builds |
 | Performance benchmarks | `perf/` directory |
+| Session sharing | `/share` command creates public URL via Kilo Cloud tunnel ⚠️ **Requires cloud server** — see note below |
 | Specs-driven dev | `specs/` directory |
+
+> ⚠️ **CRITICAL NOTE — Session Sharing requires a NoCowboy Cloud Server**
+> The `/share` command and the share button in the sidebar history create a public URL via the Kilo Cloud tunnel (`api.kilo.ai`). In the NoCowboy fork, this fails with `InternalServerError` because the cloud gateway is stubbed (`packages/nocowboy-gateway/src/`). To make sharing work, you need to implement a NoCowboy cloud server with:
+> - User accounts & authentication
+> - Session URL generation & hosting
+> - Public read-only session views
+> - Authorization (who can share, who can view)
+> - The `POST /session/{sessionID}/share` endpoint returning `{ share: { url: string } }`
+> Until this server exists, the share UI elements will show an error toast when clicked. Sessions that were shared before the gateway was removed still have `share?.url` values in the session data and can be copied without the API call.
 
 ---
 
